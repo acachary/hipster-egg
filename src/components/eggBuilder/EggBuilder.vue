@@ -115,7 +115,7 @@
         </v-btn>
       </v-layout>
       <v-layout
-        row
+        column
         align-center
         justify-center
         fill-height
@@ -126,8 +126,37 @@
           <span v-if="selectedEgg.body.onSale" slot="badge">Sale!</span>
           <h2>{{selectedEgg.body.title}}</h2>
         </v-badge>
+        <v-btn
+          :loading="showCart"
+          :disabled="showCart"
+          color="blue-grey"
+          class="white--text"
+          @click="addToCart()"
+        >
+          Add to cart
+          <v-icon right>add_shopping_cart</v-icon>
+        </v-btn>
       </v-layout>
     </div>
+    <v-navigation-drawer
+      v-model="showCart"
+      dark
+      absolute
+      temporary
+      right
+    >
+      <v-list>
+        <v-list-tile
+          v-for="(egg, index) in cart"
+          :key="index"
+        >
+          <v-list-tile-content>
+            <v-list-tile-title>{{egg.body.title}}</v-list-tile-title>
+          </v-list-tile-content>
+          <v-list-tile-action>{{egg.cost}}</v-list-tile-action>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
   </v-container>
 </template>
 
@@ -149,6 +178,8 @@ export default {
   components: {},
   data: () => ({
     EggParts,
+    showCart: false,
+    cart: [],
     selectedBodyIndex: 0,
     selectedClothesIndex: 0,
     selectedShoesIndex: 0,
@@ -189,6 +220,14 @@ export default {
         this.selectedShoesIndex,
         EggParts.shoes.length,
       );
+    },
+    addToCart() {
+      this.showCart = true;
+      const egg = this.selectedEgg;
+      const cost = egg.body.cost
+        + egg.clothes.cost
+        + egg.shoes.cost;
+      this.cart.push(Object.assign({}, egg, { cost }));
     },
   },
   computed: {
